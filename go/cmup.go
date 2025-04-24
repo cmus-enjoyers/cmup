@@ -1,7 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 func main() {
-	fmt.Println("ZZZZZZMup")
+	fmt.Println(math.Abs(-1))
 }

@@ -12,9 +12,13 @@ func main() {
 	fmt.Println(math.Abs(-1))
 	fmt.Println(z, "goida")
 
+	const someThing = "my!lane"
+
 	bestNumberInTheWorld := 14
 
 	bestNumberInTheWorldFloat := float32(bestNumberInTheWorld) + 0.1
 
 	fmt.Printf("xx %v %T\n ", bestNumberInTheWorldFloat, bestNumberInTheWorldFloat)
+
+	fmt.Println(someThing, "constant")
 }

@@ -16,5 +16,5 @@ func main() {
 
 	bestNumberInTheWorldFloat := float32(bestNumberInTheWorld) + 0.1
 
-	fmt.Println(bestNumberInTheWorldFloat, "afdsadsfsdfasdfsdassdfsdfsdfsf ")
+	fmt.Printf("xx %v %T\n ", bestNumberInTheWorldFloat, bestNumberInTheWorldFloat)
 }

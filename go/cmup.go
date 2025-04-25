@@ -6,11 +6,10 @@ import (
 	"math/cmplx"
 )
 
-var z complex128 = cmplx.Sqrt(-5 + 12i)
+var x complex128 = cmplx.Sqrt(-5 + 12i)
 
 func main() {
 	fmt.Println(math.Abs(-1))
-	fmt.Println(z, "goida")
 
 	const someThing = "my!lane"
 
@@ -20,5 +19,5 @@ func main() {
 
 	fmt.Printf("xx %v %T\n ", bestNumberInTheWorldFloat, bestNumberInTheWorldFloat)
 
-	fmt.Println(someThing, "constant")
+	fmt.Println(someThing, "constant", x)
 }

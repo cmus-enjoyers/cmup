@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/cmplx"
+	"math/rand"
 )
 
 var x complex128 = cmplx.Sqrt(-5 + 12i)
@@ -23,5 +24,9 @@ func main() {
 
 	for i := 1000; i > 0; i -= 7 {
 		fmt.Println("x", i-7)
+	}
+
+	if x := rand.Float32(); x > 0.5 {
+		fmt.Println("random num is greater than 0.5", x)
 	}
 }

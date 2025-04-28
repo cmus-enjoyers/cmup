@@ -9,6 +9,16 @@ import (
 
 var x complex128 = cmplx.Sqrt(-5 + 12i)
 
+func Sqrt(x float64) float64 {
+	z := 1.0
+
+	for i := 0; i < 10; i++ {
+		z -= (z*z - x) / (2 * z)
+	}
+
+	return z
+}
+
 func main() {
 	fmt.Println(math.Abs(-1))
 
@@ -29,4 +39,6 @@ func main() {
 	if x := rand.Float32(); x > 0.5 {
 		fmt.Println("random num is greater than 0.5", x)
 	}
+
+	fmt.Println(Sqrt(52))
 }

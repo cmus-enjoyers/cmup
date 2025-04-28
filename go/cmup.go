@@ -20,4 +20,8 @@ func main() {
 	fmt.Printf("xx %v %T\n ", bestNumberInTheWorldFloat, bestNumberInTheWorldFloat)
 
 	fmt.Println(someThing, "constant", x)
+
+	for i := 1000; i > 0; i -= 7 {
+		fmt.Println("x", i-7)
+	}
 }

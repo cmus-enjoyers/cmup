@@ -27,11 +27,9 @@ func main() {
 
 	fmt.Println(os.ReadDir(path.Join(home, "Music")))
 
-	var array = append(playlists, playlist)
+	playlists = append(playlists, playlist)
 
-	fmt.Println(array)
-
-	for index, value := range array {
+	for index, value := range playlists {
 		fmt.Println(value.name, index)
 	}
 }

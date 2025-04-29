@@ -48,4 +48,15 @@ func main() {
 	}
 
 	fmt.Println(Pic(10, 10))
+
+	coolMap := make(map[string]int)
+
+	coolMap["zxc"] = 1000 - 7
+
+	coolMap["three"] = 3
+	coolMap["two"] = 2
+
+	delete(coolMap, "two")
+
+	fmt.Println(coolMap)
 }

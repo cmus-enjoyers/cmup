@@ -11,6 +11,20 @@ type Playlist struct {
 	subPlaylists []*Playlist
 }
 
+func Pic(dx, dy int) [][]uint8 {
+	var arry = make([][]uint8, dy)
+
+	for y := range arry {
+		arry[y] = make([]uint8, dx)
+
+		for x := range arry[y] {
+			arry[y][x] = uint8((x + y) / 2)
+		}
+	}
+
+	return arry
+}
+
 func main() {
 	var playlist = Playlist{name: "Test Playlist"}
 
@@ -32,4 +46,6 @@ func main() {
 	for index, value := range playlists {
 		fmt.Println(value.name, index)
 	}
+
+	fmt.Println(Pic(10, 10))
 }

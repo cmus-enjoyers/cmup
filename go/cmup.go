@@ -14,6 +14,8 @@ type Playlist struct {
 func main() {
 	var playlist = Playlist{name: "Test Playlist"}
 
+	var playlists = make([]Playlist, 0)
+
 	var home, err = os.UserHomeDir()
 
 	if err != nil {
@@ -24,4 +26,8 @@ func main() {
 	fmt.Println(playlist)
 
 	fmt.Println(os.ReadDir(path.Join(home, "Music")))
+
+	var array = append(playlists, playlist)
+
+	fmt.Println(array)
 }

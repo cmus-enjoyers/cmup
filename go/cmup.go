@@ -30,4 +30,8 @@ func main() {
 	var array = append(playlists, playlist)
 
 	fmt.Println(array)
+
+	for index, value := range array {
+		fmt.Println(value.name, index)
+	}
 }

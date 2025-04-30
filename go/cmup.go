@@ -38,6 +38,18 @@ func countWords(s string) map[string]int {
 	return result
 }
 
+func log(fn func(x, y uint8) uint8) func(x, y uint8) uint8 {
+	fmt.Println()
+
+	return func(x, y uint8) uint8 {
+		result := fn(x, y)
+
+		fmt.Println("[LOG] result: ", result)
+
+		return result
+	}
+}
+
 func main() {
 	var playlist = Playlist{name: "Test Playlist"}
 
@@ -66,4 +78,10 @@ func main() {
 	delete(coolMap, "two")
 
 	fmt.Println(countWords("I am learning Go! Go!"))
+
+	test := log(func(x, y uint8) uint8 {
+		return x ^ y
+	})
+
+	test(10, 15)
 }

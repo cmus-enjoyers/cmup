@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 )
 
 type Playlist struct {
@@ -25,6 +26,18 @@ func Pic(dx, dy int) [][]uint8 {
 	return arry
 }
 
+func countWords(s string) map[string]int {
+	fields := strings.Fields(s)
+
+	result := map[string]int{}
+
+	for _, value := range fields {
+		result[value] += 1
+	}
+
+	return result
+}
+
 func main() {
 	var playlist = Playlist{name: "Test Playlist"}
 
@@ -43,12 +56,6 @@ func main() {
 
 	playlists = append(playlists, playlist)
 
-	for index, value := range playlists {
-		fmt.Println(value.name, index)
-	}
-
-	fmt.Println(Pic(10, 10))
-
 	coolMap := make(map[string]int)
 
 	coolMap["zxc"] = 1000 - 7
@@ -58,5 +65,5 @@ func main() {
 
 	delete(coolMap, "two")
 
-	fmt.Println(coolMap)
+	fmt.Println(countWords("I am learning Go! Go!"))
 }

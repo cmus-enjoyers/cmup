@@ -12,6 +12,10 @@ type Playlist struct {
 	subPlaylists []*Playlist
 }
 
+func (playlist Playlist) Print() {
+	fmt.Println("Playlist", playlist.name, "len", len(playlist.subPlaylists))
+}
+
 func Pic(dx, dy int) [][]uint8 {
 	var arry = make([][]uint8, dy)
 
@@ -52,6 +56,8 @@ func log(fn func(x, y uint8) uint8) func(x, y uint8) uint8 {
 
 func main() {
 	var playlist = Playlist{name: "Test Playlist"}
+
+	playlist.Print()
 
 	var playlists = make([]Playlist, 0)
 

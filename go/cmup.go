@@ -16,8 +16,8 @@ func (playlist Playlist) Print() {
 	fmt.Println("Playlist", playlist.name, "len", len(playlist.subPlaylists))
 }
 
-func readPlaylist(dir os.DirEntry) {
-	fmt.Println(dir.Name(), "dir")
+func readPlaylist(dir os.DirEntry) Playlist {
+	return Playlist{dir.Name(), make([]*Playlist, 0)}
 }
 
 func cmup(homePath string) []Playlist {
@@ -28,7 +28,7 @@ func cmup(homePath string) []Playlist {
 	if err == nil {
 		for _, value := range dir {
 			if value.IsDir() {
-				readPlaylist(value)
+				result = append(result, readPlaylist(value))
 			}
 		}
 	}
@@ -40,7 +40,7 @@ func main() {
 	home, err := os.UserHomeDir()
 
 	if err == nil {
-		cmup(home)
+		fmt.Println(cmup(home))
 	} else {
 		fmt.Println(err, "error")
 	}

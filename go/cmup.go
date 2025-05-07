@@ -16,11 +16,19 @@ func (playlist Playlist) Print() {
 	fmt.Println("Playlist", playlist.name, "len", len(playlist.subPlaylists))
 }
 
+func readPlaylist(dir os.DirEntry) {
+	fmt.Println(dir.Name(), "dir")
+}
+
 func cmup(homePath string) {
 	dir, err := os.ReadDir(path.Join(homePath, "Music"))
 
 	if err == nil {
-		fmt.Println(dir)
+		for _, value := range dir {
+			if value.IsDir() {
+				readPlaylist(value)
+			}
+		}
 	}
 }
 

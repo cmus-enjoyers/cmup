@@ -20,8 +20,10 @@ func readPlaylist(dir os.DirEntry) {
 	fmt.Println(dir.Name(), "dir")
 }
 
-func cmup(homePath string) {
+func cmup(homePath string) []Playlist {
 	dir, err := os.ReadDir(path.Join(homePath, "Music"))
+
+	result := make([]Playlist, 0)
 
 	if err == nil {
 		for _, value := range dir {
@@ -30,6 +32,8 @@ func cmup(homePath string) {
 			}
 		}
 	}
+
+	return result
 }
 
 func main() {

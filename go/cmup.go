@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -16,8 +17,12 @@ func (playlist Playlist) Print() {
 	fmt.Println("Playlist", playlist.name, "len", len(playlist.subPlaylists))
 }
 
-func readPlaylist(dir os.DirEntry) Playlist {
-	return Playlist{dir.Name(), make([]*Playlist, 0)}
+func readPlaylist(dir os.DirEntry, path string) (Playlist, error) {
+	if !dir.IsDir() {
+		return Playlist{"", make([]*Playlist, 0)}, errors.New("Dir isn't a dir")
+	}
+
+	return Playlist{dir.Name(), make([]*Playlist, 0)}, nil
 }
 
 func cmup(homePath string) []Playlist {

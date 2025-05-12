@@ -35,10 +35,7 @@ func cmup(homePath string) []Playlist {
 			if value.IsDir() {
 				playlist, err := readPlaylist(value, path.Join(homePath, value.Name()))
 
-				if err == nil {
-
-					result = append(result, playlist)
-				}
+				result = append(result)
 			}
 		}
 	}

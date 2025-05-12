@@ -10,6 +10,7 @@ import (
 
 type Playlist struct {
 	name         string
+	content      []string
 	subPlaylists []*Playlist
 }
 
@@ -19,10 +20,16 @@ func (playlist Playlist) Print() {
 
 func readPlaylist(dir os.DirEntry, path string) (Playlist, error) {
 	if !dir.IsDir() {
-		return Playlist{"", make([]*Playlist, 0)}, errors.New("Dir isn't a dir")
+		return Playlist{dir.Name(), make([]string, 0), make([]*Playlist, 0)}, errors.New("Dir isn't a dir")
 	}
 
-	return Playlist{dir.Name(), make([]*Playlist, 0)}, nil
+	content, err := os.ReadDir(path)
+
+	if err == nil {
+		return Playlist{dir.Name(), make([]string, 0), make([]*Playlist, 0)}, nil
+	}
+
+	return Playlist{dir.Name(), make([]string, 0), make([]*Playlist, 0)}, err
 }
 
 func cmup(homePath string) []Playlist {

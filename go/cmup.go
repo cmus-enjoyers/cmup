@@ -36,7 +36,6 @@ func cmup(homePath string) []Playlist {
 				playlist, err := readPlaylist(value, path.Join(homePath, value.Name()))
 
 				if err == nil {
-
 					result = append(result, playlist)
 				}
 			}

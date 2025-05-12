@@ -46,10 +46,12 @@ func cmup(homePath string) ([]Playlist, error) {
 	if err == nil {
 		for _, value := range dir {
 			if value.IsDir() {
-				playlist, err := readPlaylist(value, path.Join(homePath, value.Name()))
+				playlist, err := readPlaylist(value, path.Join(homePath, "Music", value.Name()))
 
 				if err == nil {
 					result = append(result, playlist)
+				} else {
+					fmt.Println(err, "in cmup")
 				}
 			}
 		}

@@ -72,6 +72,10 @@ func writePlaylist(playlist Playlist, output string) {
 				fmt.Printf("Warning: %v\n", writeErr)
 			}
 		}
+
+		for _, value := range playlist.subPlaylists {
+			writePlaylist(value, output)
+		}
 	} else {
 		fmt.Printf("Warning: %v\n", err)
 	}

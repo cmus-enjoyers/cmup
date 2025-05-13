@@ -61,9 +61,27 @@ func readPlaylist(dir os.DirEntry, dirPath string) (Playlist, error) {
 	return Playlist{dir.Name(), result, nested}, nil
 }
 
-func readMusicPlaylists(homePath string) ([]Playlist, error) {
+func writePlaylist(playlist Playlist, output string) {
+	file, err := os.OpenFile(path.Join(output, playlist.name), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+
+	if err == nil {
+		for _, value := range playlist.content {
+			_, writeErr := file.WriteString(value)
+
+			if writeErr != nil {
+				fmt.Printf("Warning: %v\n", writeErr)
+			}
+		}
+	} else {
+		fmt.Printf("Warning: %v\n", err)
+	}
+}
+
+func cmup(homePath string) ([]Playlist, error) {
 	musicDir := path.Join(homePath, "Music")
 	dir, err := os.ReadDir(musicDir)
+
+	output := path.Join(homePath, ".config", "cmus", "playlists")
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to read Music directory: %w", err)
@@ -84,6 +102,8 @@ func readMusicPlaylists(homePath string) ([]Playlist, error) {
 			continue
 		}
 
+		writePlaylist(playlist, output)
+
 		result = append(result, playlist)
 	}
 
@@ -97,7 +117,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	playlists, err := readMusicPlaylists(home)
+	playlists, err := cmup(home)
 
 	if err != nil {
 		fmt.Printf("Error reading music playlists: %v\n", err)

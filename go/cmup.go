@@ -5,37 +5,53 @@ import (
 	"fmt"
 	"os"
 	"path"
-	// "strings"
 )
 
 type Playlist struct {
 	name         string
 	content      []string
-	subPlaylists []*Playlist
+	subPlaylists []Playlist
 }
 
 func (playlist Playlist) Print() {
 	fmt.Println("Playlist", playlist.name, "len", len(playlist.subPlaylists))
 }
 
+func handleNestedPlaylist(dir os.DirEntry, dirPath string, result *[]Playlist) {
+	playlist, err := readPlaylist(dir, dirPath)
+
+	if err == nil {
+		*result = append(*result, playlist)
+	}
+}
+
 func readPlaylist(dir os.DirEntry, dirPath string) (Playlist, error) {
 	if !dir.IsDir() {
-		return Playlist{dir.Name(), make([]string, 0), make([]*Playlist, 0)}, errors.New("Dir isn't a dir")
+		return Playlist{dir.Name(), make([]string, 0), make([]Playlist, 0)}, errors.New("Dir isn't a dir")
 	}
 
 	content, err := os.ReadDir(dirPath)
 
 	if err == nil {
 		result := make([]string, 0)
+		nested := make([]Playlist, 0)
 
 		for _, value := range content {
-			result = append(result, path.Join(dirPath, value.Name()))
+			valuePath := path.Join(dirPath, value.Name())
+
+			if !value.IsDir() {
+				result = append(result, valuePath)
+
+				continue
+			}
+
+			handleNestedPlaylist(value, valuePath, &nested)
 		}
 
-		return Playlist{dir.Name(), result, make([]*Playlist, 0)}, nil
+		return Playlist{dir.Name(), result, nested}, nil
 	}
 
-	return Playlist{dir.Name(), make([]string, 0), make([]*Playlist, 0)}, err
+	return Playlist{dir.Name(), make([]string, 0), make([]Playlist, 0)}, err
 }
 
 func cmup(homePath string) ([]Playlist, error) {

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 type Playlist struct {
@@ -14,82 +14,99 @@ type Playlist struct {
 }
 
 func (playlist Playlist) Print() {
-	fmt.Println("Playlist", playlist.name, "len", len(playlist.subPlaylists))
-}
+	fmt.Printf("Playlist: %s (Files: %d, Sub-playlists: %d)\n",
+		playlist.name, len(playlist.content), len(playlist.subPlaylists))
 
-func handleNestedPlaylist(dir os.DirEntry, dirPath string, result *[]Playlist) {
-	playlist, err := readPlaylist(dir, dirPath)
+	for _, file := range playlist.content {
+		fmt.Printf("  - File: %s\n", filepath.Base(file))
+	}
 
-	if err == nil {
-		*result = append(*result, playlist)
+	for _, sub := range playlist.subPlaylists {
+		fmt.Printf("  - Sub-playlist: %s\n", sub.name)
 	}
 }
 
 func readPlaylist(dir os.DirEntry, dirPath string) (Playlist, error) {
 	if !dir.IsDir() {
-		return Playlist{dir.Name(), make([]string, 0), make([]Playlist, 0)}, errors.New("Dir isn't a dir")
+		return Playlist{}, fmt.Errorf("cannot read playlist from '%s': not a directory", dir.Name())
 	}
 
 	content, err := os.ReadDir(dirPath)
 
-	if err == nil {
-		result := make([]string, 0)
-		nested := make([]Playlist, 0)
-
-		for _, value := range content {
-			valuePath := path.Join(dirPath, value.Name())
-
-			if !value.IsDir() {
-				result = append(result, valuePath)
-
-				continue
-			}
-
-			handleNestedPlaylist(value, valuePath, &nested)
-		}
-
-		return Playlist{dir.Name(), result, nested}, nil
+	if err != nil {
+		return Playlist{}, fmt.Errorf("failed to read directory '%s': %w", dirPath, err)
 	}
 
-	return Playlist{dir.Name(), make([]string, 0), make([]Playlist, 0)}, err
+	result := make([]string, 0)
+	nested := make([]Playlist, 0)
+
+	for _, entry := range content {
+		entryPath := path.Join(dirPath, entry.Name())
+
+		if !entry.IsDir() {
+			result = append(result, entryPath)
+			continue
+		}
+
+		subPlaylist, err := readPlaylist(entry, entryPath)
+
+		if err != nil {
+			fmt.Printf("Warning: %v\n", err)
+			continue
+		}
+
+		nested = append(nested, subPlaylist)
+	}
+
+	return Playlist{dir.Name(), result, nested}, nil
 }
 
-func cmup(homePath string) ([]Playlist, error) {
-	dir, err := os.ReadDir(path.Join(homePath, "Music"))
+func readMusicPlaylists(homePath string) ([]Playlist, error) {
+	musicDir := path.Join(homePath, "Music")
+	dir, err := os.ReadDir(musicDir)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to read Music directory: %w", err)
+	}
 
 	result := make([]Playlist, 0)
 
-	if err == nil {
-		for _, value := range dir {
-			if value.IsDir() {
-				playlist, err := readPlaylist(value, path.Join(homePath, "Music", value.Name()))
-
-				if err == nil {
-					result = append(result, playlist)
-				} else {
-					fmt.Println(err, "in cmup")
-				}
-			}
+	for _, entry := range dir {
+		if !entry.IsDir() {
+			continue
 		}
 
-		return result, nil
+		playlistPath := path.Join(musicDir, entry.Name())
+		playlist, err := readPlaylist(entry, playlistPath)
+
+		if err != nil {
+			fmt.Printf("Warning: %v\n", err)
+			continue
+		}
+
+		result = append(result, playlist)
 	}
 
-	return make([]Playlist, 0), err
+	return result, nil
 }
 
 func main() {
 	home, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Printf("Error getting user home directory: %v\n", err)
+		os.Exit(1)
+	}
 
-	if err == nil {
-		result, err := cmup(home)
+	playlists, err := readMusicPlaylists(home)
 
-		if err == nil {
-			fmt.Println(result)
-		} else {
-			fmt.Println("Gmup errored :(", err)
-		}
-	} else {
-		fmt.Println(err, "error")
+	if err != nil {
+		fmt.Printf("Error reading music playlists: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("Found %d playlists\n", len(playlists))
+
+	for _, playlist := range playlists {
+		playlist.Print()
 	}
 }

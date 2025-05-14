@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 type Playlist struct {
@@ -24,6 +25,21 @@ func (playlist Playlist) Print() {
 	for _, sub := range playlist.subPlaylists {
 		fmt.Printf("  - Sub-playlist: %s\n", sub.name)
 	}
+}
+
+func endsWithDollar(str string) bool {
+	return strings.HasSuffix(str, "$")
+}
+
+func readSubPlaylist(result *[]Playlist, entry os.DirEntry, entryPath string) {
+
+	subPlaylist, err := readPlaylist(entry, entryPath)
+
+	if err != nil {
+		fmt.Printf("Warning: %v\n", err)
+	}
+
+	*result = append(*result, subPlaylist)
 }
 
 func readPlaylist(dir os.DirEntry, dirPath string) (Playlist, error) {
@@ -48,14 +64,7 @@ func readPlaylist(dir os.DirEntry, dirPath string) (Playlist, error) {
 			continue
 		}
 
-		subPlaylist, err := readPlaylist(entry, entryPath)
-
-		if err != nil {
-			fmt.Printf("Warning: %v\n", err)
-			continue
-		}
-
-		nested = append(nested, subPlaylist)
+		readSubPlaylist(&nested, entry, entryPath)
 	}
 
 	return Playlist{dir.Name(), result, nested}, nil

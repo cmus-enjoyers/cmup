@@ -31,7 +31,8 @@ func endsWithDollar(str string) bool {
 	return strings.HasSuffix(str, "$")
 }
 
-func readSubPlaylist(result *[]Playlist, entry os.DirEntry, entryPath string) {
+func readSubPlaylist(parent string, result *[]Playlist, entry os.DirEntry, entryPath string) {
+	name := entry.Name()
 
 	subPlaylist, err := readPlaylist(entry, entryPath)
 
@@ -39,12 +40,18 @@ func readSubPlaylist(result *[]Playlist, entry os.DirEntry, entryPath string) {
 		fmt.Printf("Warning: %v\n", err)
 	}
 
+	if endsWithDollar(name) {
+		subPlaylist.name = parent + "-" + subPlaylist.name
+	}
+
 	*result = append(*result, subPlaylist)
 }
 
 func readPlaylist(dir os.DirEntry, dirPath string) (Playlist, error) {
+	dirName := dir.Name()
+
 	if !dir.IsDir() {
-		return Playlist{}, fmt.Errorf("cannot read playlist from '%s': not a directory", dir.Name())
+		return Playlist{}, fmt.Errorf("cannot read playlist from '%s': not a directory", dirName)
 	}
 
 	content, err := os.ReadDir(dirPath)
@@ -64,7 +71,7 @@ func readPlaylist(dir os.DirEntry, dirPath string) (Playlist, error) {
 			continue
 		}
 
-		readSubPlaylist(&nested, entry, entryPath)
+		readSubPlaylist(dirName, &nested, entry, entryPath)
 	}
 
 	return Playlist{dir.Name(), result, nested}, nil

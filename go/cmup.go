@@ -79,10 +79,11 @@ func readPlaylist(dir os.DirEntry, dirPath string) (Playlist, error) {
 
 func writePlaylist(playlist Playlist, output string) {
 	file, err := os.OpenFile(path.Join(output, playlist.name), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	defer file.Close()
 
 	if err == nil {
 		for _, value := range playlist.content {
-			_, writeErr := file.WriteString(value)
+			_, writeErr := file.WriteString(value + "\n")
 
 			if writeErr != nil {
 				fmt.Printf("Warning: %v\n", writeErr)

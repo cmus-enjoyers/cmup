@@ -1,7 +1,7 @@
 program Cmup;
 {$mode objfpc}
 
-uses SysUtils, StrUtils, Classes, Process, Crt;
+uses SysUtils, StrUtils, Classes;
 
 function GetNestedDirectoreies(const Directory: String): TStringList;
 var

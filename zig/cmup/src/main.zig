@@ -122,6 +122,14 @@ pub fn cmupPlaylistsToHashMap(
     return map;
 }
 
+pub fn normalizeInputPath(allocator: std.mem.Allocator, home: []const u8, input: []const u8) ![]u8 {
+    if (std.fs.path.isAbsolute(input)) {
+        return @constCast(input);
+    }
+
+    return std.fs.path.join(allocator, &.{ home, input });
+}
+
 pub fn main() !void {
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer arena.deinit();
@@ -140,7 +148,8 @@ pub fn main() !void {
 
     if (home) |value| {
         const cmus_playlist_path = try std.fs.path.join(allocator, &[_][]const u8{ value, ".config/cmus/playlists" });
-        const cmus_music_path = try if (input) |input_path| std.fs.path.join(allocator, &.{ value, input_path }) else std.fs.path.join(allocator, &.{ value, "Music" });
+
+        const cmus_music_path = try if (input) |input_path| normalizeInputPath(allocator, value, input_path) else std.fs.path.join(allocator, &.{ value, "Music" });
 
         const stdout = std.io.getStdOut().writer();
 

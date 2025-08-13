@@ -100,7 +100,7 @@ pub const Lexer = struct {
     }
 
     pub fn popContext(lexer: *Lexer) ?ContextType {
-        return lexer.context_stack.popOrNull();
+        return lexer.context_stack.pop();
     }
 
     pub fn peekContext(lexer: *Lexer) ?ContextType {

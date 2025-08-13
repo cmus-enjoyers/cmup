@@ -27,6 +27,22 @@ pub fn hasArg(args: [][]u8, comptime arg_name: []const u8) bool {
     return false;
 }
 
+pub fn getArgValue(args: [][]u8, comptime key: []const u8) ![]const u8 {
+    for (args, 0..) |arg, i| {
+        if (std.mem.eql(u8, arg, key)) {
+            const next_arg = args[i + 1];
+
+            if (std.mem.eql(u8, next_arg, &[_]u8{0})) {
+                return error.NoValueForArgument;
+            }
+
+            return next_arg;
+        }
+    }
+
+    return error.NoArg;
+}
+
 pub fn printQueriesInfo(out: std.fs.File.Writer, queries_amount: usize, is_pure: bool) !void {
     const pure_text = if (is_pure) " (Pure)" else "";
 
@@ -115,13 +131,16 @@ pub fn main() !void {
     const args = try std.process.argsAlloc(allocator);
 
     defer std.process.argsFree(allocator, args);
-    const has_write = hasArg(args, "--write");
+    // TODO: remove @ptrCast()
+    const has_write = hasArg(@ptrCast(args), "--write");
+
+    const input = getArgValue(@ptrCast(args), "--input") catch null;
 
     const home = std.posix.getenv("HOME");
 
     if (home) |value| {
         const cmus_playlist_path = try std.fs.path.join(allocator, &[_][]const u8{ value, ".config/cmus/playlists" });
-        const cmus_music_path = try std.fs.path.join(allocator, &.{ value, "Music" });
+        const cmus_music_path = try if (input) |input_path| std.fs.path.join(allocator, &.{ value, input_path }) else std.fs.path.join(allocator, &.{ value, "Music" });
 
         const stdout = std.io.getStdOut().writer();
 
@@ -137,16 +156,16 @@ pub fn main() !void {
         var map = try cmupPlaylistsToHashMap(allocator, result.playlists.items);
         defer map.deinit();
 
-        if (hasArg(args, "--print-everything")) {
+        if (hasArg(@ptrCast(args), "--print-everything")) {
             try cmup.printCmupPlaylists(result.playlists.items, "");
         }
 
-        const is_pure = hasArg(args, "--pure");
+        const is_pure = hasArg(@ptrCast(args), "--pure");
 
         try printQueriesInfo(stdout, result.zql.items.len, is_pure);
 
         if (has_write) {
-            try executeZqls(allocator, result.zql.items, map, cmus_playlist_path, stdout, hasArg(args, "--pure"));
+            try executeZqls(allocator, result.zql.items, map, cmus_playlist_path, stdout, hasArg(@ptrCast(args), "--pure"));
             try printSuccess();
         } else {
             try printInfo();

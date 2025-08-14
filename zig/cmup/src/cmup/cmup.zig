@@ -1,6 +1,7 @@
 // TODO: fully refactor cmup
 
 const std = @import("std");
+const fmts = @import("../utils/fmts.zig");
 const path_utils = @import("../utils/path.zig");
 
 pub const CmupPlaylist = struct {
@@ -242,10 +243,14 @@ pub fn cmup(
             "music",
         });
 
-        break :blk try getDirEntryNames(allocator, try std.fs.path.join(allocator, &.{
+        break :blk getDirEntryNames(allocator, try std.fs.path.join(allocator, &.{
             std.fs.path.dirname(music_path).?,
             "music",
-        }));
+        })) catch {
+            std.debug.print("Couldn't open dir {s}\n", .{music_path});
+
+            std.process.exit(1);
+        };
     };
 
     var result = std.ArrayList(CmupPlaylist).init(allocator);

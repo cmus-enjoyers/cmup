@@ -18,7 +18,7 @@ pub fn printInfo() !void {
     try writer.writeAll("If you wish to write playlists into your cmus config playlists\ntry adding --write flag");
 }
 
-pub fn hasArg(args: [][]u8, comptime arg_name: []const u8) bool {
+pub fn hasArg(args: [][:0]u8, comptime arg_name: []const u8) bool {
     for (args) |arg| {
         if (std.mem.eql(u8, arg, arg_name)) {
             return true;
@@ -27,7 +27,7 @@ pub fn hasArg(args: [][]u8, comptime arg_name: []const u8) bool {
     return false;
 }
 
-pub fn getArgValue(args: [][]u8, comptime key: []const u8) ![]const u8 {
+pub fn getArgValue(args: [][:0]u8, comptime key: []const u8) ![]const u8 {
     for (args, 0..) |arg, i| {
         if (std.mem.eql(u8, arg, key)) {
             const next_arg = args[i + 1];
@@ -139,10 +139,10 @@ pub fn main() !void {
     const args = try std.process.argsAlloc(allocator);
 
     defer std.process.argsFree(allocator, args);
-    // TODO: remove @ptrCast()
-    const has_write = hasArg(@ptrCast(args), "--write");
 
-    const input = getArgValue(@ptrCast(args), "--input") catch null;
+    const has_write = hasArg(args, "--write");
+
+    const input = getArgValue(args, "--input") catch null;
 
     const home = std.posix.getenv("HOME");
 
@@ -165,16 +165,16 @@ pub fn main() !void {
         var map = try cmupPlaylistsToHashMap(allocator, result.playlists.items);
         defer map.deinit();
 
-        if (hasArg(@ptrCast(args), "--print-everything")) {
+        if (hasArg(args, "--print-everything")) {
             try cmup.printCmupPlaylists(result.playlists.items, "");
         }
 
-        const is_pure = hasArg(@ptrCast(args), "--pure");
+        const is_pure = hasArg(args, "--pure");
 
         try printQueriesInfo(stdout, result.zql.items.len, is_pure);
 
         if (has_write) {
-            try executeZqls(allocator, result.zql.items, map, cmus_playlist_path, stdout, hasArg(@ptrCast(args), "--pure"));
+            try executeZqls(allocator, result.zql.items, map, cmus_playlist_path, stdout, hasArg(args, "--pure"));
             try printSuccess();
         } else {
             try printInfo();

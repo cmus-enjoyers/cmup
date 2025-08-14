@@ -24,9 +24,6 @@ pub fn build(b: *std.Build) void {
         run_cmd.addArgs(args);
     }
 
-    const file = b.addInstallFile(b.path("./man.1"), "share/man/man1/zmup.1");
-    install_step.dependOn(&file.step);
-
     const run_step = b.step("run", "Run the cmup");
     run_step.dependOn(&run_cmd.step);
 }

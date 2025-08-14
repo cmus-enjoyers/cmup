@@ -107,7 +107,7 @@ pub fn printUnsuportedEntryError(name: []const u8) !void {
 
     const writer = std.io.getStdErr().writer();
 
-    try writer.print(yellow ++ "Zmup Warning" ++ reset ++ ": Unknown entry format at {s}\n", .{name});
+    try writer.print(fmts.zmup_warn_fmt ++ "Unknown entry format at {s}\n", .{name});
 }
 
 pub fn endsWithDollar(string: []const u8) bool {

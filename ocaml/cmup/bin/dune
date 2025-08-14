@@ -1,4 +1,0 @@
-(executable
- (public_name cmup)
- (name main)
- (libraries cmup))

@@ -1,11 +1,11 @@
 # Maintainer: Viktor Yenokh <viktorenokh@gmail.com>
 pkgname=zmup-git
-pkgver=0.0.0.r   # will be set automatically by pkgver()
+pkgver=0.0.0.r
 pkgrel=1
 pkgdesc="Cmus playlist generator"
 arch=(x86_64 aarch64)
 url="https://github.com/cmus-enjoyers/cmup"
-license=('MIT')  # change to your actual license
+license=('MIT')
 depends=()
 provides=("${pkgname%-git}")
 conflicts=("${pkgname%-git}")

@@ -301,8 +301,8 @@ pub fn printCmupPlaylist(
     }
 }
 
-pub fn printCmupPlaylists(playlists: []const CmupPlaylist, comptime spacing: []const u8) !void {
+pub fn printCmupPlaylists(allocator: std.mem.Allocator, playlists: []const CmupPlaylist, comptime spacing: []const u8) !void {
     for (playlists) |item| {
-        try printCmupPlaylist(item, spacing);
+        try printCmupPlaylist(allocator, item, spacing);
     }
 }

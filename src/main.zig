@@ -166,7 +166,7 @@ pub fn main() !void {
         defer map.deinit();
 
         if (hasArg(args, "--print-everything")) {
-            try cmup.printCmupPlaylists(result.playlists.items, "");
+            try cmup.printCmupPlaylists(allocator, result.playlists.items, "");
         }
 
         const is_pure = hasArg(args, "--pure");

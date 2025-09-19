@@ -15,11 +15,12 @@ fn identifierDistanceLessThan(context: void, a: IdentifierLevenshteinDistance, b
 
 pub fn findClosestIdentifier(allocator: std.mem.Allocator, map: std.StringHashMap(CmupPlaylist), identifier: []const u8) ![]const u8 {
     var iter = map.iterator();
-    var array = std.ArrayList(IdentifierLevenshteinDistance).init(allocator);
-    defer array.deinit();
+    var array: std.ArrayList(IdentifierLevenshteinDistance) = .empty;
+    defer array.deinit(allocator);
 
     while (iter.next()) |value| {
         try array.append(
+            allocator,
             IdentifierLevenshteinDistance{
                 .value = value.key_ptr,
                 .distance = try levenshteinDistance(

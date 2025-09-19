@@ -104,7 +104,13 @@ pub fn executeZqls(
 
         try cmup.writeCmupPlaylist(result.playlist, playlist_path);
 
-        try stdout.print(colors.green_text("") ++ " {s}\n", .{result.playlist.name});
+        const fmt = try std.fmt.allocPrint(
+            allocator,
+            colors.green_text("") ++ " {s}\n",
+            .{result.playlist.name},
+        );
+
+        try stdout.writeAll(fmt);
 
         if (!pure) {
             try executeSideEffects(allocator, result.side_effects.items, playlist_path);

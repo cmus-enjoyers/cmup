@@ -79,11 +79,14 @@ pub const Lexer = struct {
     line: usize,
 
     pub fn init(input: []const u8, allocator: std.mem.Allocator) Lexer {
+        const tokens: std.ArrayList(Token) = .empty;
+        const context_stack: std.ArrayList(ContextType) = .empty;
+
         return Lexer{
             .input = input,
             .position = 0,
-            .tokens = std.ArrayList(Token).init(allocator),
-            .context_stack = std.ArrayList(ContextType).init(allocator),
+            .tokens = tokens,
+            .context_stack = context_stack,
             .allocator = allocator,
             .line_position = 0,
             .line = 1,
@@ -91,12 +94,12 @@ pub const Lexer = struct {
     }
 
     pub fn deinit(lexer: *Lexer) void {
-        lexer.tokens.deinit();
-        lexer.context_stack.deinit();
+        lexer.tokens.deinit(lexer.allocator);
+        lexer.context_stack.deinit(lexer.allocator);
     }
 
     pub fn pushContext(lexer: *Lexer, context: ContextType) !void {
-        try lexer.context_stack.append(context);
+        try lexer.context_stack.append(lexer.allocator, context);
     }
 
     pub fn popContext(lexer: *Lexer) ?ContextType {
@@ -225,7 +228,7 @@ pub const Lexer = struct {
             .line_position = lexer.line_position,
         };
 
-        try lexer.tokens.append(token);
+        try lexer.tokens.append(lexer.allocator, token);
 
         return token;
     }
@@ -302,7 +305,7 @@ pub const Lexer = struct {
         }
 
         if (token_type != TokenType.Comment) {
-            try lexer.tokens.append(token);
+            try lexer.tokens.append(lexer.allocator, token);
         }
 
         return token;

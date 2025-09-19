@@ -100,14 +100,15 @@ pub fn addMusicToPlaylist(
     }
 }
 
-pub fn printUnsuportedEntryError(name: []const u8) !void {
+pub fn printUnsuportedEntryError(allocator: std.mem.Allocator, name: []const u8) !void {
     if (std.mem.eql(u8, name, "zchat")) {
         return;
     }
 
     const writer = std.fs.File.stderr();
+    const fmt = try std.fmt.allocPrint(allocator, fmts.zmup_warn_fmt ++ "Unknown entry format at {s}\n", .{name});
 
-    try writer.print(fmts.zmup_warn_fmt ++ "Unknown entry format at {s}\n", .{name});
+    try writer.writeAll(fmt);
 }
 
 pub fn endsWithDollar(string: []const u8) bool {

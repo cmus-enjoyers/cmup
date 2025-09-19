@@ -43,13 +43,16 @@ pub fn getArgValue(args: [][:0]u8, comptime key: []const u8) ![]const u8 {
     return error.NoArg;
 }
 
-pub fn printQueriesInfo(out: std.fs.File.Writer, queries_amount: usize, is_pure: bool) !void {
+pub fn printQueriesInfo(allocator: std.mem.Allocator, out: std.fs.File, queries_amount: usize, is_pure: bool) !void {
     const pure_text = if (is_pure) " (Pure)" else "";
 
-    try out.print(
+    const fmt = try std.fmt.allocPrint(
+        allocator,
         colors.green_text("Zql{s}" ++ colors.dim_text(": ") ++ "{} queries found \n\n"),
         .{ pure_text, queries_amount },
     );
+
+    try out.writeAll(fmt);
 }
 
 pub fn putCmupPlaylist(map: *std.StringHashMap(CmupPlaylist), playlist: CmupPlaylist) !void {
@@ -84,7 +87,7 @@ pub fn executeZqls(
     zql_src: []cmup.ZqlSrc,
     map: std.StringHashMap(CmupPlaylist),
     playlist_path: []const u8,
-    stdout: std.fs.File.Writer,
+    stdout: std.fs.File,
     pure: bool,
 ) !void {
     for (zql_src) |src| {
@@ -171,7 +174,7 @@ pub fn main() !void {
 
         const is_pure = hasArg(args, "--pure");
 
-        try printQueriesInfo(stdout, result.zql.items.len, is_pure);
+        try printQueriesInfo(allocator, stdout, result.zql.items.len, is_pure);
 
         if (has_write) {
             try executeZqls(allocator, result.zql.items, map, cmus_playlist_path, stdout, hasArg(args, "--pure"));

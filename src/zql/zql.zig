@@ -43,11 +43,13 @@ pub fn run(
 
     const allocator = arena.allocator();
 
-    var file = try std.fs.cwd().openFile(path, .{ .mode = .read_only });
-    var buf_reader = std.io.bufferedReader(file.reader());
-    var stream = buf_reader.reader();
+    const file = try std.fs.cwd().openFile(path, .{ .mode = .read_only });
 
-    const query = try stream.readAllAlloc(allocator, 102400);
+    var buf: [102400]u8 = undefined;
+
+    var buf_reader: std.fs.File.Reader = .init(file, &buf);
+
+    const query = buf_reader.interface.readAll();
 
     var lexer = Lexer.init(query, allocator);
     defer lexer.deinit();

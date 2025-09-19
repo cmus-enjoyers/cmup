@@ -284,20 +284,25 @@ pub fn printCmupPlaylist(
 ) !void {
     const writer = std.fs.File.stderr();
 
-    const fmt = std.fmt.allocPrint(
+    const playlist_fmt = try std.fmt.allocPrint(
         allocator,
         "Playlist" ++ green ++ " {s} " ++ reset ++ "on path {s} with musics amount {}\n",
         .{ playlist.name, playlist.path, playlist.content.len },
     );
+    defer allocator.destroy(playlist_fmt);
 
-    try writer.writeAll(fmt);
+    try writer.writeAll(playlist_fmt);
 
     for (playlist.content) |value| {
-        try writer.print(spacing ++ "  {s}\n", .{value});
+        const content_fmt = try std.fmt.allocPrint(allocator, spacing ++ "  {s}\n", .{value});
+
+        defer allocator.destroy(content_fmt);
+
+        try writer.writeAll(content_fmt);
     }
 
     for (playlist.sub_playlists) |sub_playlist| {
-        try printCmupPlaylist(sub_playlist.*, "  ");
+        try printCmupPlaylist(allocator, sub_playlist.*, "  ");
     }
 }
 

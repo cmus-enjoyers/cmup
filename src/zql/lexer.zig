@@ -260,7 +260,7 @@ pub const Lexer = struct {
             lexer.position += 1;
         }
 
-        const stderr = std.io.getStdErr();
+        const stderr = std.fs.File.stderr();
 
         while (lexer.shouldConsume(is_string)) {
             if (is_string) {

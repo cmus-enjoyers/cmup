@@ -109,7 +109,7 @@ pub const Parser = struct {
     pub fn printSyntaxError(parser: *Parser, token: lxer.Token) !void {
         try token.printErr(
             parser.allocator,
-            std.io.getStdErr(),
+            std.fs.File.stderr(),
             err.Error.SyntaxError,
             parser.lexer.input,
         );
@@ -264,7 +264,7 @@ pub const Parser = struct {
         while (parser.position < parser.lexer.tokens.items.len) : ({
             parser.move();
         }) {
-            const stderr = std.io.getStdErr();
+            const stderr = std.fs.File.stderr();
             const item = parser.lexer.tokens.items[parser.position];
 
             const node = try switch (item.type) {

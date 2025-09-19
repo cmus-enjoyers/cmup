@@ -105,7 +105,7 @@ pub fn printUnsuportedEntryError(name: []const u8) !void {
         return;
     }
 
-    const writer = std.io.getStdErr().writer();
+    const writer = std.fs.File.stderr();
 
     try writer.print(fmts.zmup_warn_fmt ++ "Unknown entry format at {s}\n", .{name});
 }
@@ -277,7 +277,7 @@ pub fn cmup(
 }
 
 pub fn printCmupPlaylist(playlist: CmupPlaylist, comptime spacing: []const u8) !void {
-    const writer = std.io.getStdOut().writer();
+    const writer = std.fs.File.stderr();
 
     try writer.print("Playlist" ++ green ++ " {s} " ++ reset ++ "on path {s} with musics amount {}\n", .{ playlist.name, playlist.path, playlist.content.len });
 

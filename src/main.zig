@@ -7,13 +7,13 @@ const CmupPlaylist = cmup.CmupPlaylist;
 const path_utils = @import("utils/path.zig");
 
 pub fn printSuccess() !void {
-    const writer = std.io.getStdOut().writer();
+    const writer = std.fs.File.stdout();
 
     try writer.writeAll("\nUpdated playlists :)\n");
 }
 
 pub fn printInfo() !void {
-    const writer = std.io.getStdOut().writer();
+    const writer = std.fs.File.stdout();
 
     try writer.writeAll("If you wish to write playlists into your cmus config playlists\ntry adding --write flag");
 }
@@ -151,7 +151,7 @@ pub fn main() !void {
 
         const cmus_music_path = try if (input) |input_path| normalizeInputPath(allocator, value, input_path) else std.fs.path.join(allocator, &.{ value, "Music" });
 
-        const stdout = std.io.getStdOut().writer();
+        const stdout = std.fs.File.stdout();
 
         if (args.len == 2 and std.mem.eql(u8, args[1], "clear")) {
             try clear(cmus_playlist_path);

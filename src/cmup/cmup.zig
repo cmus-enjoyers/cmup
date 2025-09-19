@@ -88,12 +88,12 @@ pub fn addMusicToPlaylist(
     const file_path = try std.fs.path.join(allocator, &.{ path, entry.name });
 
     if (isMusic(entry.name)) {
-        try result.append(file_path);
+        try result.append(allocator, file_path);
         return;
     }
 
     if (isZql(entry.name)) {
-        try zql_result.append(ZqlSrc{
+        try zql_result.append(allocator, ZqlSrc{
             .src = file_path,
             .parent_name = playlist_name,
         });
@@ -133,7 +133,7 @@ pub fn createCmusSubPlaylist(
         zql_paths,
     );
 
-    try ptrs.append(playlist);
+    try ptrs.append(allocator, playlist);
 }
 
 pub fn readCmupPlaylist(
@@ -146,15 +146,15 @@ pub fn readCmupPlaylist(
     var dir = try std.fs.openDirAbsolute(path, .{ .iterate = true });
     var iterator = dir.iterate();
 
-    var ptrs = std.ArrayList(*CmupPlaylist).init(allocator);
+    var ptrs: std.ArrayList(*CmupPlaylist) = .empty;
 
-    var result = std.ArrayList([]const u8).init(allocator);
+    var result: std.ArrayList([]const u8) = .empty;
 
     while (try iterator.next()) |item| {
         try switch (item.kind) {
             .file, .sym_link => addMusicToPlaylist(allocator, path, &result, zql_paths, item, playlist_name),
             .directory => createCmusSubPlaylist(allocator, &ptrs, cmus_path, path, item.name, zql_paths),
-            else => printUnsuportedEntryError(item.name),
+            else => printUnsuportedEntryError(allocator, item.name),
         };
     }
 
@@ -224,7 +224,7 @@ const CmupResult = struct {
     playlists: std.ArrayList(CmupPlaylist),
     zql: std.ArrayList(ZqlSrc),
 
-    pub fn deinit(allocator: std.mem.Allocator, result: *CmupResult) void {
+    pub fn deinit(result: *CmupResult, allocator: std.mem.Allocator) void {
         result.playlists.deinit(allocator);
         result.zql.deinit(allocator);
     }
@@ -268,7 +268,7 @@ pub fn cmup(
             try writeCmupPlaylist(playlist, playlist_path);
         }
 
-        try result.append(playlist);
+        try result.append(allocator, playlist);
     }
 
     return CmupResult{

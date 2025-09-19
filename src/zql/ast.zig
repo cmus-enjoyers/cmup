@@ -90,16 +90,18 @@ pub const Parser = struct {
     nodes: std.ArrayList(ASTNode),
 
     pub fn init(lexer: *Lexer, allocator: std.mem.Allocator) Parser {
+        const nodes: std.ArrayList(ASTNode) = .empty;
+
         return Parser{
             .lexer = lexer,
             .allocator = allocator,
-            .nodes = std.ArrayList(ASTNode).init(allocator),
+            .nodes = nodes,
             .position = 0,
         };
     }
 
     pub fn deinit(parser: *Parser) void {
-        parser.nodes.deinit();
+        parser.nodes.deinit(parser.allocator);
     }
 
     pub fn move(parser: *Parser) void {
@@ -125,7 +127,7 @@ pub const Parser = struct {
 
     pub fn parseRequire(parser: *Parser, token: lxer.Token) !ASTNode {
         // TODO: fix memory leak here later
-        var sources = std.ArrayList(Source).init(parser.allocator);
+        var sources: std.ArrayList(Source) = .empty;
 
         while (parser.peekNextToken()) |value| {
             if (value.type != .Identifier) {
@@ -140,13 +142,13 @@ pub const Parser = struct {
 
                     const as_target = try parser.expectTokenType(as_token, .Identifier);
 
-                    try sources.append(Source{ .as = as_target, .source = value });
+                    try sources.append(parser.allocator, Source{ .as = as_target, .source = value });
 
                     continue;
                 }
             }
 
-            try sources.append(Source{ .source = value, .as = null });
+            try sources.append(parser.allocator, Source{ .source = value, .as = null });
         }
 
         if (sources.items.len == 0) {
@@ -209,7 +211,7 @@ pub const Parser = struct {
             parser.move();
 
             // TODO: fix memory leaks here
-            var filters = std.ArrayList(ASTFilter).init(parser.allocator);
+            var filters: std.ArrayList(ASTFilter) = .empty;
 
             const filter = try parser.parseFilter(value);
 
@@ -220,10 +222,10 @@ pub const Parser = struct {
 
                 parser.move();
 
-                try filters.append(try parser.parseFilter(value));
+                try filters.append(parser.allocator, try parser.parseFilter(value));
             }
 
-            try filters.append(filter);
+            try filters.append(parser.allocator, filter);
 
             return filters.items;
         }
@@ -283,7 +285,7 @@ pub const Parser = struct {
                 else => continue,
             };
 
-            try parser.nodes.append(node);
+            try parser.nodes.append(parser.allocator, node);
         }
     }
 };

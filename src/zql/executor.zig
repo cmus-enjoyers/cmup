@@ -99,11 +99,11 @@ pub const Executor = struct {
     }
 
     pub fn filterPlaylist(executor: *Executor, filters: []Ast.ASTFilter, playlist: CmupPlaylist) !std.ArrayList([]const u8) {
-        var result = std.ArrayList([]const u8).init(executor.allocator);
+        var result: std.ArrayList([]const u8) = .empty;
 
         for (filters) |filter| {
             if (std.mem.eql(u8, filter.data.field.lexeme, "name")) {
-                try filterByName(&result, playlist, filter.data);
+                try filterByName(executor.allocator, &result, playlist, filter.data);
             }
         }
 
@@ -115,12 +115,12 @@ pub const Executor = struct {
             if (data.filters) |filters| {
                 const tracks = try executor.filterPlaylist(filters, value);
 
-                try result.appendSlice(tracks.items);
+                try result.appendSlice(executor.allocator, tracks.items);
 
                 return;
             }
 
-            try result.appendSlice(value.content);
+            try result.appendSlice(executor.allocator, value.content);
 
             return;
         }
@@ -140,14 +140,14 @@ pub const Executor = struct {
             return error.ReferenceError;
         };
 
-        try side_effects.append(SideEffect{
+        try side_effects.append(executor.allocator, SideEffect{
             .Remove = .{ .playlist = playlist.name },
         });
     }
 
     pub fn execute(executor: *Executor, name: []const u8) !ExecutorResult {
-        var result = std.ArrayList([]const u8).init(executor.allocator);
-        var side_effects = std.ArrayList(SideEffect).init(executor.allocator);
+        var result: std.ArrayList([]const u8) = .empty;
+        var side_effects: std.ArrayList(SideEffect) = .empty;
 
         for (executor.ast) |node| {
             try switch (node.data) {

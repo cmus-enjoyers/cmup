@@ -61,7 +61,7 @@ pub fn run(
 
     try parser.parse();
 
-    var executor = Executor.init(allocator, map, parser.nodes.items, std.io.getStdErr(), query);
+    var executor = Executor.init(allocator, map, parser.nodes.items, std.fs.File.stderr(), query);
 
     return executor.execute(getFileNameWithoutExtension(path));
 }

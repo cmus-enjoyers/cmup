@@ -49,7 +49,7 @@ pub fn run(
 
     var buf_reader: std.fs.File.Reader = .init(file, &buf);
 
-    const query = buf_reader.interface.readAll();
+    const query = try buf_reader.interface.readAlloc(allocator, 102400);
 
     var lexer = Lexer.init(query, allocator);
     defer lexer.deinit();

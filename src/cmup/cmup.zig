@@ -65,7 +65,7 @@ pub fn getDirEntryNames(allocator: std.mem.Allocator, path: []const u8) anyerror
     defer dir.close();
     var iterator = dir.iterate();
 
-    var result = std.ArrayList([]const u8).init(allocator);
+    var result = std.ArrayList([]const u8).initCapacity(allocator, 0);
 
     while (try iterator.next()) |value| {
         switch (value.kind) {
@@ -253,8 +253,8 @@ pub fn cmup(
         };
     };
 
-    var result = std.ArrayList(CmupPlaylist).init(allocator);
-    var zql_result = std.ArrayList(ZqlSrc).init(allocator);
+    var result = std.ArrayList(CmupPlaylist).initCapacity(allocator, 0);
+    var zql_result = std.ArrayList(ZqlSrc).initCapacity(allocator, 0);
 
     for (playlists.items) |value| {
         if (std.ascii.startsWithIgnoreCase(value, ".")) {

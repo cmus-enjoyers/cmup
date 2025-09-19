@@ -70,7 +70,7 @@ pub fn getDirEntryNames(allocator: std.mem.Allocator, path: []const u8) anyerror
     while (try iterator.next()) |value| {
         switch (value.kind) {
             .directory => try result.append(allocator, try allocator.dupe(u8, value.name)),
-            else => try printUnsuportedEntryError(value.name),
+            else => try printUnsuportedEntryError(allocator, value.name),
         }
     }
 

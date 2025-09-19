@@ -289,14 +289,11 @@ pub fn printCmupPlaylist(
         "Playlist" ++ green ++ " {s} " ++ reset ++ "on path {s} with musics amount {}\n",
         .{ playlist.name, playlist.path, playlist.content.len },
     );
-    defer allocator.destroy(playlist_fmt);
 
     try writer.writeAll(playlist_fmt);
 
     for (playlist.content) |value| {
         const content_fmt = try std.fmt.allocPrint(allocator, spacing ++ "  {s}\n", .{value});
-
-        defer allocator.destroy(content_fmt);
 
         try writer.writeAll(content_fmt);
     }

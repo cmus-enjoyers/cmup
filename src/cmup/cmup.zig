@@ -223,9 +223,9 @@ const CmupResult = struct {
     playlists: std.ArrayList(CmupPlaylist),
     zql: std.ArrayList(ZqlSrc),
 
-    pub fn deinit(result: *CmupResult) void {
-        result.playlists.deinit();
-        result.zql.deinit();
+    pub fn deinit(allocator: std.mem.Allocator, result: *CmupResult) void {
+        result.playlists.deinit(allocator);
+        result.zql.deinit(allocator);
     }
 };
 

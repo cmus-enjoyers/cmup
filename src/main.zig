@@ -160,7 +160,7 @@ pub fn main() !void {
         }
 
         var result = try cmup.cmup(allocator, has_write, cmus_music_path, cmus_playlist_path);
-        defer result.deinit();
+        defer result.deinit(allocator);
 
         var map = try cmupPlaylistsToHashMap(allocator, result.playlists.items);
         defer map.deinit();

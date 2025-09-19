@@ -277,10 +277,20 @@ pub fn cmup(
     };
 }
 
-pub fn printCmupPlaylist(playlist: CmupPlaylist, comptime spacing: []const u8) !void {
+pub fn printCmupPlaylist(
+    allocator: std.mem.Allocator,
+    playlist: CmupPlaylist,
+    comptime spacing: []const u8,
+) !void {
     const writer = std.fs.File.stderr();
 
-    try writer.print("Playlist" ++ green ++ " {s} " ++ reset ++ "on path {s} with musics amount {}\n", .{ playlist.name, playlist.path, playlist.content.len });
+    const fmt = std.fmt.allocPrint(
+        allocator,
+        "Playlist" ++ green ++ " {s} " ++ reset ++ "on path {s} with musics amount {}\n",
+        .{ playlist.name, playlist.path, playlist.content.len },
+    );
+
+    try writer.writeAll(fmt);
 
     for (playlist.content) |value| {
         try writer.print(spacing ++ "  {s}\n", .{value});
